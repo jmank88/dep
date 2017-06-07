@@ -47,6 +47,7 @@ func mkNaiveSM(t *testing.T) (*SourceMgr, func()) {
 	}
 
 	sm, err := NewSourceManager(SourceManagerConfig{
+		CacheAge: -1,
 		Cachedir: cpath,
 		Logger:   log.New(test.Writer{TB: t}, "", 0),
 	})
@@ -68,6 +69,7 @@ func remakeNaiveSM(osm *SourceMgr, t *testing.T) (*SourceMgr, func()) {
 	osm.Release()
 
 	sm, err := NewSourceManager(SourceManagerConfig{
+		CacheAge: -1,
 		Cachedir: cpath,
 		Logger:   log.New(test.Writer{TB: t}, "", 0),
 	})
@@ -90,6 +92,7 @@ func TestSourceManagerInit(t *testing.T) {
 		t.Errorf("Failed to create temp dir: %s", err)
 	}
 	cfg := SourceManagerConfig{
+		CacheAge: -1,
 		Cachedir: cpath,
 		Logger:   log.New(test.Writer{TB: t}, "", 0),
 	}
@@ -152,6 +155,7 @@ func TestSourceInit(t *testing.T) {
 	}
 
 	sm, err := NewSourceManager(SourceManagerConfig{
+		CacheAge: -1,
 		Cachedir: cpath,
 		Logger:   log.New(test.Writer{TB: t}, "", 0),
 	})
@@ -362,9 +366,12 @@ func (f sourceCreationTestFixture) run(t *testing.T) {
 	defer clean()
 
 	for _, pi := range f.roots {
-		_, err := sm.SourceExists(pi)
+		exists, err := sm.SourceExists(pi)
 		if err != nil {
 			t.Fatal(err)
+		}
+		if !exists {
+			t.Errorf("expected source to exists for %s", pi)
 		}
 	}
 

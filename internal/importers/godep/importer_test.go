@@ -107,6 +107,7 @@ func TestGodepConfig_Import(t *testing.T) {
 
 	projectRoot := h.Path(importertest.RootProject)
 	sm, err := gps.NewSourceManager(gps.SourceManagerConfig{
+		CacheAge: -1,
 		Cachedir: h.Path(cacheDir),
 		Logger:   log.New(test.Writer{TB: t}, "", 0),
 	})

@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"github.com/golang/dep"
 	"github.com/golang/dep/internal/fs"
@@ -162,6 +163,7 @@ func (c *Config) Run() int {
 			flags := flag.NewFlagSet(cmdName, flag.ContinueOnError)
 			flags.SetOutput(c.Stderr)
 			verbose := flags.Bool("v", false, "enable verbose logging")
+			cacheAge := flags.Duration("cache-age", 24*time.Hour, "maximum valid age of cached source data. 0: always refresh. <0: no cache")
 
 			// Register the subcommand flags in there, too.
 			cmd.Register(flags)
@@ -201,6 +203,7 @@ func (c *Config) Run() int {
 				Verbose:        *verbose,
 				DisableLocking: getEnv(c.Env, "DEPNOLOCK") != "",
 				Cachedir:       cachedir,
+				CacheAge:       *cacheAge,
 			}
 
 			GOPATHS := filepath.SplitList(getEnv(c.Env, "GOPATH"))

@@ -181,6 +181,7 @@ func TestValidateParams(t *testing.T) {
 	cacheDir := "gps-cache"
 	h.TempDir(cacheDir)
 	sm, err := NewSourceManager(SourceManagerConfig{
+		CacheAge: -1,
 		Cachedir: h.Path(cacheDir),
 		Logger:   log.New(test.Writer{TB: t}, "", 0),
 	})

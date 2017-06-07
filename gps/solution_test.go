@@ -139,6 +139,7 @@ func BenchmarkCreateVendorTree(b *testing.B) {
 
 	clean := true
 	sm, err := NewSourceManager(SourceManagerConfig{
+		CacheAge: -1,
 		Cachedir: path.Join(tmp, "cache"),
 		Logger:   log.New(test.Writer{TB: b}, "", 0),
 	})

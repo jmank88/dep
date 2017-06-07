@@ -25,9 +25,10 @@ func NewTestContext(h *test.Helper) *dep.Ctx {
 	discardLogger := log.New(ioutil.Discard, "", 0)
 
 	return &dep.Ctx{
-		GOPATH: pwd,
-		Out:    discardLogger,
-		Err:    discardLogger,
+		GOPATH:   pwd,
+		Out:      discardLogger,
+		Err:      discardLogger,
+		CacheAge: -1,
 	}
 }
 

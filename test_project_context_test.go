@@ -38,9 +38,10 @@ func NewTestProjectContext(h *test.Helper, projectName string) *TestProjectConte
 	// Set up a Source Manager
 	var err error
 	pc.Context = &Ctx{
-		GOPATH: pc.tempDir,
-		Out:    discardLogger(),
-		Err:    discardLogger(),
+		GOPATH:   pc.tempDir,
+		Out:      discardLogger(),
+		Err:      discardLogger(),
+		CacheAge: -1,
 	}
 	pc.SourceManager, err = pc.Context.SourceManager()
 	h.Must(errors.Wrap(err, "Unable to create a SourceManager"))

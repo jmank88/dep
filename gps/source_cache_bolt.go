@@ -30,7 +30,7 @@ type boltCache struct {
 
 // newBoltCache returns a new boltCache backed by a BoltDB file under the cache directory.
 func newBoltCache(cd string, epoch int64, logger *log.Logger) (*boltCache, error) {
-	path := sourceCachePath(cd, "bolt") + ".db"
+	path := sourceCachePath(cd, "cache") + ".db"
 	dir := filepath.Dir(path)
 	if fi, err := os.Stat(dir); os.IsNotExist(err) {
 		if err := os.MkdirAll(dir, os.ModeDir|os.ModePerm); err != nil {

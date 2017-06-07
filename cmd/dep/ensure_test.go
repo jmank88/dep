@@ -213,9 +213,10 @@ func TestValidateUpdateArgs(t *testing.T) {
 	stderrOutput := &bytes.Buffer{}
 	errLogger := log.New(stderrOutput, "", 0)
 	ctx := &dep.Ctx{
-		GOPATH: pwd,
-		Out:    log.New(ioutil.Discard, "", 0),
-		Err:    errLogger,
+		GOPATH:   pwd,
+		Out:      log.New(ioutil.Discard, "", 0),
+		Err:      errLogger,
+		CacheAge: -1,
 	}
 
 	sm, err := ctx.SourceManager()
