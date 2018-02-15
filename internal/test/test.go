@@ -5,7 +5,6 @@
 package test
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"go/format"
@@ -20,6 +19,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/golang/dep/internal/compat"
 	"github.com/pkg/errors"
 )
 
@@ -55,7 +55,7 @@ type Helper struct {
 	tempdir        string
 	ran            bool
 	inParallel     bool
-	stdout, stderr bytes.Buffer
+	stdout, stderr compat.StrBuffer
 }
 
 // NewHelper initializes a new helper for testing.
@@ -300,13 +300,13 @@ func (h *Helper) getStderr() string {
 // doGrepMatch looks for a regular expression in a buffer, and returns
 // whether it is found. The regular expression is matched against
 // each line separately, as with the grep command.
-func (h *Helper) doGrepMatch(match string, b *bytes.Buffer) bool {
+func (h *Helper) doGrepMatch(match string, s string) bool {
 	if !h.ran {
 		h.t.Fatalf("%+v", errors.New("internal testsuite error: grep called before run"))
 	}
 	re := regexp.MustCompile(match)
-	for _, ln := range bytes.Split(b.Bytes(), []byte{'\n'}) {
-		if re.Match(ln) {
+	for _, ln := range strings.Split(s, "\n") {
+		if re.MatchString(ln) {
 			return true
 		}
 	}
@@ -317,8 +317,8 @@ func (h *Helper) doGrepMatch(match string, b *bytes.Buffer) bool {
 // is not found. The name argument is the name of the output we are
 // searching, "output" or "error".  The msg argument is logged on
 // failure.
-func (h *Helper) doGrep(match string, b *bytes.Buffer, name, msg string) {
-	if !h.doGrepMatch(match, b) {
+func (h *Helper) doGrep(match string, s string, name, msg string) {
+	if !h.doGrepMatch(match, s) {
 		h.t.Log(msg)
 		h.t.Logf("pattern %v not found in standard %s", match, name)
 		h.t.FailNow()
@@ -328,19 +328,19 @@ func (h *Helper) doGrep(match string, b *bytes.Buffer, name, msg string) {
 // grepStdout looks for a regular expression in the test run's
 // standard output and fails, logging msg, if it is not found.
 func (h *Helper) grepStdout(match, msg string) {
-	h.doGrep(match, &h.stdout, "output", msg)
+	h.doGrep(match, h.stdout.String(), "output", msg)
 }
 
 // grepStderr looks for a regular expression in the test run's
 // standard error and fails, logging msg, if it is not found.
 func (h *Helper) grepStderr(match, msg string) {
-	h.doGrep(match, &h.stderr, "error", msg)
+	h.doGrep(match, h.stderr.String(), "error", msg)
 }
 
 // grepBoth looks for a regular expression in the test run's standard
 // output or stand error and fails, logging msg, if it is not found.
 func (h *Helper) grepBoth(match, msg string) {
-	if !h.doGrepMatch(match, &h.stdout) && !h.doGrepMatch(match, &h.stderr) {
+	if !h.doGrepMatch(match, h.stdout.String()) && !h.doGrepMatch(match, h.stderr.String()) {
 		h.t.Log(msg)
 		h.t.Logf("pattern %v not found in standard output or standard error", match)
 		h.t.FailNow()
@@ -349,8 +349,8 @@ func (h *Helper) grepBoth(match, msg string) {
 
 // doGrepNot looks for a regular expression in a buffer and fails if
 // it is found. The name and msg arguments are as for doGrep.
-func (h *Helper) doGrepNot(match string, b *bytes.Buffer, name, msg string) {
-	if h.doGrepMatch(match, b) {
+func (h *Helper) doGrepNot(match string, s string, name, msg string) {
+	if h.doGrepMatch(match, s) {
 		h.t.Log(msg)
 		h.t.Logf("pattern %v found unexpectedly in standard %s", match, name)
 		h.t.FailNow()
@@ -360,34 +360,34 @@ func (h *Helper) doGrepNot(match string, b *bytes.Buffer, name, msg string) {
 // grepStdoutNot looks for a regular expression in the test run's
 // standard output and fails, logging msg, if it is found.
 func (h *Helper) grepStdoutNot(match, msg string) {
-	h.doGrepNot(match, &h.stdout, "output", msg)
+	h.doGrepNot(match, h.stdout.String(), "output", msg)
 }
 
 // grepStderrNot looks for a regular expression in the test run's
 // standard error and fails, logging msg, if it is found.
 func (h *Helper) grepStderrNot(match, msg string) {
-	h.doGrepNot(match, &h.stderr, "error", msg)
+	h.doGrepNot(match, h.stderr.String(), "error", msg)
 }
 
 // grepBothNot looks for a regular expression in the test run's
 // standard output or stand error and fails, logging msg, if it is
 // found.
 func (h *Helper) grepBothNot(match, msg string) {
-	if h.doGrepMatch(match, &h.stdout) || h.doGrepMatch(match, &h.stderr) {
+	if h.doGrepMatch(match, h.stdout.String()) || h.doGrepMatch(match, h.stderr.String()) {
 		h.t.Log(msg)
 		h.t.Fatalf("%+v", errors.Errorf("pattern %v found unexpectedly in standard output or standard error", match))
 	}
 }
 
 // doGrepCount counts the number of times a regexp is seen in a buffer.
-func (h *Helper) doGrepCount(match string, b *bytes.Buffer) int {
+func (h *Helper) doGrepCount(match string, s string) int {
 	if !h.ran {
 		h.t.Fatalf("%+v", errors.New("internal testsuite error: doGrepCount called before run"))
 	}
 	re := regexp.MustCompile(match)
 	c := 0
-	for _, ln := range bytes.Split(b.Bytes(), []byte{'\n'}) {
-		if re.Match(ln) {
+	for _, ln := range strings.Split(s, "\n") {
+		if re.MatchString(ln) {
 			c++
 		}
 	}
@@ -397,7 +397,7 @@ func (h *Helper) doGrepCount(match string, b *bytes.Buffer) int {
 // grepCountBoth returns the number of times a regexp is seen in both
 // standard output and standard error.
 func (h *Helper) grepCountBoth(match string) int {
-	return h.doGrepCount(match, &h.stdout) + h.doGrepCount(match, &h.stderr)
+	return h.doGrepCount(match, h.stdout.String()) + h.doGrepCount(match, h.stderr.String())
 }
 
 // creatingTemp records that the test plans to create a temporary file

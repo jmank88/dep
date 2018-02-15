@@ -5,7 +5,6 @@
 package importertest
 
 import (
-	"bytes"
 	"io/ioutil"
 	"log"
 	"sort"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/golang/dep"
 	"github.com/golang/dep/gps"
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/test"
 	"github.com/pkg/errors"
 )
@@ -58,15 +58,15 @@ func (tc TestCase) Execute(t *testing.T, convert func(logger *log.Logger, sm gps
 	defer sm.Release()
 
 	// Capture stderr so we can verify warnings
-	output := &bytes.Buffer{}
+	output := &compat.StrBuffer{}
 	ctx.Err = log.New(output, "", 0)
 
 	manifest, lock := convert(ctx.Err, sm)
-	return tc.validate(manifest, lock, output)
+	return tc.validate(manifest, lock, output.String())
 }
 
 // validate returns an error if any of the testcase validations failed.
-func (tc TestCase) validate(manifest *dep.Manifest, lock *dep.Lock, output *bytes.Buffer) error {
+func (tc TestCase) validate(manifest *dep.Manifest, lock *dep.Lock, output string) error {
 	if !equalSlice(manifest.Ignored, tc.WantIgnored) {
 		return errors.Errorf("unexpected set of ignored projects: \n\t(GOT) %#v \n\t(WNT) %#v",
 			manifest.Ignored, tc.WantIgnored)
@@ -156,7 +156,7 @@ func (tc TestCase) validate(manifest *dep.Manifest, lock *dep.Lock, output *byte
 	}
 
 	if tc.WantWarning != "" {
-		gotWarning := output.String()
+		gotWarning := output
 		if !strings.Contains(gotWarning, tc.WantWarning) {
 			return errors.Errorf("Expected the output to include the warning '%s' but got '%s'\n", tc.WantWarning, gotWarning)
 		}

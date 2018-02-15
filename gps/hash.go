@@ -5,12 +5,13 @@
 package gps
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"io"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/golang/dep/internal/compat"
 )
 
 // string headers used to demarcate sections in hash input creation
@@ -111,12 +112,12 @@ func (s *solver) writeHashingInputs(w io.Writer) {
 	writeString(strconv.Itoa(ai.Version))
 }
 
-// bytes.Buffer wrapper that injects newlines after each call to Write().
-type nlbuf bytes.Buffer
+// compat.StrBuffer wrapper that injects newlines after each call to Write().
+type nlbuf compat.StrBuffer
 
 func (buf *nlbuf) Write(p []byte) (n int, err error) {
-	n, _ = (*bytes.Buffer)(buf).Write(p)
-	(*bytes.Buffer)(buf).WriteByte('\n')
+	n, _ = (*compat.StrBuffer)(buf).Write(p)
+	(*compat.StrBuffer)(buf).WriteByte('\n')
 	return n + 1, nil
 }
 
@@ -129,5 +130,5 @@ func HashingInputsAsString(s Solver) string {
 	buf := new(nlbuf)
 	ts.writeHashingInputs(buf)
 
-	return (*bytes.Buffer)(buf).String()
+	return (*compat.StrBuffer)(buf).String()
 }

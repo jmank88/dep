@@ -5,13 +5,13 @@
 package gps
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net/url"
 	"path/filepath"
 
 	"github.com/Masterminds/vcs"
+	"github.com/golang/dep/internal/compat"
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +30,7 @@ type maybeSource interface {
 type errorSlice []error
 
 func (errs *errorSlice) Error() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	for _, err := range *errs {
 		fmt.Fprintf(&buf, "\n\t%s", err)
 	}

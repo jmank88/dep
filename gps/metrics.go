@@ -5,12 +5,13 @@
 package gps
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"sort"
 	"text/tabwriter"
 	"time"
+
+	"github.com/golang/dep/internal/compat"
 )
 
 type metrics struct {
@@ -59,7 +60,7 @@ func (m *metrics) dump(l *log.Logger) {
 	sort.Sort(sort.Reverse(s))
 
 	var tot time.Duration
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	w := tabwriter.NewWriter(&buf, 0, 0, 1, ' ', tabwriter.AlignRight)
 	for _, nd := range s {
 		tot += nd.d
@@ -69,7 +70,7 @@ func (m *metrics) dump(l *log.Logger) {
 	w.Flush()
 
 	l.Println("\nSolver wall times by segment:")
-	l.Println((&buf).String())
+	l.Println(buf.String())
 }
 
 type ndpair struct {

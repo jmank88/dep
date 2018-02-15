@@ -5,7 +5,6 @@
 package gps
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -13,6 +12,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/test"
 )
 
@@ -156,7 +156,7 @@ func fixtureSolveSimpleChecks(fix specfix, soln Solution, err error, t *testing.
 			t.Errorf("Failure mismatch:\n\t(GOT): %s\n\t(WNT): %s", err, fixfail)
 		}
 	} else if fixfail != nil {
-		var buf bytes.Buffer
+		var buf compat.StrBuffer
 		fmt.Fprintf(&buf, "Solver succeeded, but expecting failure:\n%s\nProjects in solution:", fixfail)
 		for _, p := range soln.Projects() {
 			fmt.Fprintf(&buf, "\n\t- %s at %s", ppi(p.Ident()), p.Version())

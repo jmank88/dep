@@ -5,12 +5,12 @@
 package feedback
 
 import (
-	"bytes"
 	log2 "log"
 	"strings"
 	"testing"
 
 	"github.com/golang/dep/gps"
+	"github.com/golang/dep/internal/compat"
 	_ "github.com/golang/dep/internal/test" // DO NOT REMOVE, allows go test ./... -update to work
 )
 
@@ -45,9 +45,10 @@ func TestFeedback_Constraint(t *testing.T) {
 		},
 	}
 
+	buf := &compat.StrBuffer{}
+	log := log2.New(buf, "", 0)
 	for _, c := range cases {
-		buf := &bytes.Buffer{}
-		log := log2.New(buf, "", 0)
+		buf.Reset()
 		c.feedback.LogFeedback(log)
 		got := strings.TrimSpace(buf.String())
 		if c.want != got {
@@ -83,9 +84,10 @@ func TestFeedback_LockedProject(t *testing.T) {
 		},
 	}
 
+	buf := &compat.StrBuffer{}
+	log := log2.New(buf, "", 0)
 	for _, c := range cases {
-		buf := &bytes.Buffer{}
-		log := log2.New(buf, "", 0)
+		buf.Reset()
 		c.feedback.LogFeedback(log)
 		got := strings.TrimSpace(buf.String())
 		if c.want != got {

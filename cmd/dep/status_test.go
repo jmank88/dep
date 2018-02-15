@@ -5,7 +5,6 @@
 package main
 
 import (
-	"bytes"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -104,7 +103,7 @@ func TestBasicLine(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			var buf bytes.Buffer
+			var buf strBuffer
 
 			dotout := &dotOutput{
 				p: &project,

@@ -5,7 +5,6 @@
 package integration
 
 import (
-	"bytes"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,6 +15,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/test"
 	"github.com/pkg/errors"
 )
@@ -35,8 +35,8 @@ type TestProject struct {
 	tempdir    string
 	env        []string
 	origWd     string
-	stdout     bytes.Buffer
-	stderr     bytes.Buffer
+	stdout     compat.StrBuffer
+	stderr     compat.StrBuffer
 	run        RunFunc
 }
 

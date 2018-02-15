@@ -5,7 +5,6 @@
 package dep
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -15,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/golang/dep/gps"
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/test"
 )
 
@@ -627,7 +627,7 @@ func TestValidateProjectRoots(t *testing.T) {
 	pwd := h.Path(".")
 
 	// Capture the stderr to verify the warnings
-	stderrOutput := &bytes.Buffer{}
+	stderrOutput := &compat.StrBuffer{}
 	errLogger := log.New(stderrOutput, "", 0)
 	ctx := &Ctx{
 		GOPATH: pwd,

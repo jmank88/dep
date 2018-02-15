@@ -13,6 +13,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/golang/dep/gps/pkgtree"
+	"github.com/golang/dep/internal/compat"
 )
 
 func TestHashInputs(t *testing.T) {
@@ -550,7 +551,7 @@ func diffHashingInputs(s Solver, wnt []string) string {
 
 	lg, lw := len(got), len(wnt)
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	tw := tabwriter.NewWriter(&buf, 4, 4, 2, ' ', 0)
 	fmt.Fprintln(tw, "  (GOT)  \t  (WANT)  \t")
 

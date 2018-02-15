@@ -5,7 +5,6 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"go/build"
 	"io/ioutil"
@@ -16,6 +15,7 @@ import (
 	"github.com/golang/dep"
 	"github.com/golang/dep/gps"
 	"github.com/golang/dep/gps/pkgtree"
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/test"
 )
 
@@ -210,7 +210,7 @@ func TestValidateUpdateArgs(t *testing.T) {
 	h.TempDir("src")
 	pwd := h.Path(".")
 
-	stderrOutput := &bytes.Buffer{}
+	stderrOutput := &compat.StrBuffer{}
 	errLogger := log.New(stderrOutput, "", 0)
 	ctx := &dep.Ctx{
 		GOPATH: pwd,

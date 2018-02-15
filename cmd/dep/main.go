@@ -7,7 +7,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -225,7 +224,7 @@ func (c *Config) Run() int {
 func resetUsage(logger *log.Logger, fs *flag.FlagSet, name, args, longHelp string) {
 	var (
 		hasFlags   bool
-		flagBlock  bytes.Buffer
+		flagBlock  strBuffer
 		flagWriter = tabwriter.NewWriter(&flagBlock, 0, 4, 2, ' ', 0)
 	)
 	fs.VisitAll(func(f *flag.Flag) {

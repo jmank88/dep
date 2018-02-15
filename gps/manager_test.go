@@ -5,7 +5,6 @@
 package gps
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -21,6 +20,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/test"
 )
 
@@ -382,7 +382,7 @@ func (f sourceCreationTestFixture) run(t *testing.T) {
 	}
 	sort.Strings(keys)
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	w := tabwriter.NewWriter(&buf, 0, 4, 2, ' ', 0)
 	fmt.Fprint(w, "NAME\tMAPPED URL\n")
 	for _, r := range keys {

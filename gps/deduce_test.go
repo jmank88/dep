@@ -5,13 +5,14 @@
 package gps
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"net/url"
 	"reflect"
 	"testing"
+
+	"github.com/golang/dep/internal/compat"
 )
 
 type pathDeductionFixture struct {
@@ -505,7 +506,7 @@ func TestDeduceFromPath(t *testing.T) {
 			printmb = func(mb maybeSource, t *testing.T) string {
 				switch tmb := mb.(type) {
 				case maybeSources:
-					var buf bytes.Buffer
+					var buf compat.StrBuffer
 					fmt.Fprintf(&buf, "%v maybeSources:", len(tmb))
 					for _, elem := range tmb {
 						fmt.Fprintf(&buf, "\n\t\t%s", printmb(elem, t))

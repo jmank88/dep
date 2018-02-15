@@ -5,9 +5,10 @@
 package gps
 
 import (
-	"bytes"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/golang/dep/internal/compat"
 )
 
 // toFold returns a string with the property that strings.EqualFold(s, t) iff
@@ -29,7 +30,7 @@ func toFold(s string) string {
 	return s
 
 Slow:
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	for _, r := range s {
 		// SimpleFold(x) cycles to the next equivalent rune > x
 		// or wraps around to smaller values. Iterate until it wraps,

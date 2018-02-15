@@ -5,7 +5,6 @@
 package dep
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,6 +12,7 @@ import (
 	"path/filepath"
 
 	"github.com/golang/dep/gps"
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/fs"
 	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
@@ -185,7 +185,7 @@ func toRawLockedProjectDiffs(diffs []gps.LockedProjectDiff) rawLockedProjectDiff
 }
 
 func formatLockDiff(diff gps.LockDiff) (string, error) {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 
 	if diff.HashDiff != nil {
 		buf.WriteString(fmt.Sprintf("Memo: %s\n\n", diff.HashDiff))

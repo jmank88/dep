@@ -5,15 +5,16 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"hash/fnv"
 	"strings"
+
+	"github.com/golang/dep/internal/compat"
 )
 
 type graphviz struct {
 	ps []*gvnode
-	b  bytes.Buffer
+	b  compat.StrBuffer
 	h  map[string]uint32
 }
 
@@ -31,7 +32,7 @@ func (g graphviz) New() *graphviz {
 	return ga
 }
 
-func (g graphviz) output() bytes.Buffer {
+func (g graphviz) output() string {
 	g.b.WriteString("digraph {\n\tnode [shape=box];")
 
 	for _, gvp := range g.ps {
@@ -60,7 +61,7 @@ func (g graphviz) output() bytes.Buffer {
 	}
 
 	g.b.WriteString("\n}")
-	return g.b
+	return g.b.String()
 }
 
 func (g *graphviz) createNode(project, version string, children []string) {

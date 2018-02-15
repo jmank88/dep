@@ -5,13 +5,13 @@
 package govendor
 
 import (
-	"bytes"
 	"log"
 	"path/filepath"
 	"testing"
 
 	"github.com/golang/dep"
 	"github.com/golang/dep/gps"
+	"github.com/golang/dep/internal/compat"
 	"github.com/golang/dep/internal/importers/importertest"
 	"github.com/golang/dep/internal/test"
 	"github.com/pkg/errors"
@@ -33,7 +33,7 @@ func TestGovendorConfig_Import(t *testing.T) {
 	projectRoot := h.Path(testGovendorProjectRoot)
 
 	// Capture stderr so we can verify output
-	verboseOutput := &bytes.Buffer{}
+	verboseOutput := &compat.StrBuffer{}
 	ctx.Err = log.New(verboseOutput, "", 0)
 
 	g := NewImporter(ctx.Err, false, sm) // Disable verbose so that we don't print values that change each test run

@@ -17,11 +17,11 @@ func TestEmptyProject(t *testing.T) {
 
 	g := new(graphviz).New()
 
-	b := g.output()
+	s := g.output()
 	want := h.GetTestFileString("graphviz/empty.dot")
 
-	if b.String() != want {
-		t.Fatalf("expected '%v', got '%v'", want, b.String())
+	if s != want {
+		t.Fatalf("expected '%v', got '%v'", want, s)
 	}
 }
 
@@ -36,10 +36,10 @@ func TestSimpleProject(t *testing.T) {
 	g.createNode("foo", "master", []string{"bar"})
 	g.createNode("bar", "dev", []string{})
 
-	b := g.output()
+	s := g.output()
 	want := h.GetTestFileString("graphviz/case1.dot")
-	if b.String() != want {
-		t.Fatalf("expected '%v', got '%v'", want, b.String())
+	if s != want {
+		t.Fatalf("expected '%v', got '%v'", want, s)
 	}
 }
 
@@ -52,10 +52,10 @@ func TestNoLinks(t *testing.T) {
 
 	g.createNode("project", "", []string{})
 
-	b := g.output()
+	s := g.output()
 	want := h.GetTestFileString("graphviz/case2.dot")
-	if b.String() != want {
-		t.Fatalf("expected '%v', got '%v'", want, b.String())
+	if s != want {
+		t.Fatalf("expected '%v', got '%v'", want, s)
 	}
 }
 

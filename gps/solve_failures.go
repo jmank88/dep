@@ -5,10 +5,11 @@
 package gps
 
 import (
-	"bytes"
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/golang/dep/internal/compat"
 )
 
 func a2vs(a atom) string {
@@ -33,7 +34,7 @@ func (e *noVersionError) Error() string {
 		return fmt.Sprintf("No versions found for project %q.", e.pn.ProjectRoot)
 	}
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fmt.Fprintf(&buf, "No versions of %s met constraints:", e.pn.ProjectRoot)
 	for _, f := range e.fails {
 		fmt.Fprintf(&buf, "\n\t%s: %s", f.v, f.f.Error())
@@ -47,7 +48,7 @@ func (e *noVersionError) traceString() string {
 		return fmt.Sprintf("No versions found")
 	}
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fmt.Fprintf(&buf, "No versions of %s met constraints:", e.pn.ProjectRoot)
 	for _, f := range e.fails {
 		if te, ok := f.f.(traceError); ok {
@@ -81,7 +82,7 @@ func (e *caseMismatchFailure) Error() string {
 		return fmt.Sprintf(str, a2vs(e.goal.depender), e.goal.dep.Ident.ProjectRoot, e.current, a2vs(e.failsib[0].depender))
 	}
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 
 	str := "Could not introduce %s due to a case-only variation: it depends on %q, but %q was already established as the case variant for that project root by the following other dependers:\n"
 	fmt.Fprintf(&buf, str, a2vs(e.goal.depender), e.goal.dep.Ident.ProjectRoot, e.current)
@@ -94,7 +95,7 @@ func (e *caseMismatchFailure) Error() string {
 }
 
 func (e *caseMismatchFailure) traceString() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fmt.Fprintf(&buf, "case-only variation in dependency on %q; %q already established by:\n", e.goal.dep.Ident.ProjectRoot, e.current)
 	for _, f := range e.failsib {
 		fmt.Fprintf(&buf, "%s\n", a2vs(f.depender))
@@ -125,7 +126,7 @@ func (e *wrongCaseFailure) Error() string {
 		return fmt.Sprintf(str, a2vs(e.goal.depender), e.correct, a2vs(e.badcase[0].depender), e.badcase[0].dep.Ident.ProjectRoot)
 	}
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 
 	str := "Could not introduce %s; imports amongst its packages establish %q as the canonical casing for root, but the following projects tried to import it as %q"
 	fmt.Fprintf(&buf, str, a2vs(e.goal.depender), e.correct, e.badcase[0].dep.Ident.ProjectRoot)
@@ -138,7 +139,7 @@ func (e *wrongCaseFailure) Error() string {
 }
 
 func (e *wrongCaseFailure) traceString() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fmt.Fprintf(&buf, "internal imports establish %q as correct casing; %q was used by:\n", e.correct, e.goal.dep.Ident.ProjectRoot)
 	for _, f := range e.badcase {
 		fmt.Fprintf(&buf, "%s\n", a2vs(f.depender))
@@ -174,7 +175,7 @@ func (e *disjointConstraintFailure) Error() string {
 		return fmt.Sprintf(str, a2vs(e.goal.depender), e.goal.dep.Ident, e.goal.dep.Constraint.String(), e.failsib[0].dep.Constraint.String(), a2vs(e.failsib[0].depender))
 	}
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 
 	var sibs []dependency
 	if len(e.failsib) > 1 {
@@ -197,7 +198,7 @@ func (e *disjointConstraintFailure) Error() string {
 }
 
 func (e *disjointConstraintFailure) traceString() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fmt.Fprintf(&buf, "constraint %s on %s disjoint with other dependers:\n", e.goal.dep.Constraint.String(), e.goal.dep.Ident)
 	for _, f := range e.failsib {
 		fmt.Fprintf(
@@ -278,7 +279,7 @@ func (e *versionNotAllowedFailure) Error() string {
 		)
 	}
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 
 	fmt.Fprintf(&buf, "Could not introduce %s, as it is not allowed by constraints from the following projects:\n", a2vs(e.goal))
 
@@ -290,7 +291,7 @@ func (e *versionNotAllowedFailure) Error() string {
 }
 
 func (e *versionNotAllowedFailure) traceString() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 
 	fmt.Fprintf(&buf, "%s not allowed by constraint %s:\n", a2vs(e.goal), e.c.String())
 	for _, f := range e.failparent {
@@ -341,7 +342,7 @@ func (e *sourceMismatchFailure) Error() string {
 }
 
 func (e *sourceMismatchFailure) traceString() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fmt.Fprintf(&buf, "disagreement on network addr for %s:\n", e.shared)
 
 	fmt.Fprintf(&buf, "  %s from %s\n", e.mismatch, e.prob.id)
@@ -375,7 +376,7 @@ type checkeeHasProblemPackagesFailure struct {
 }
 
 func (e *checkeeHasProblemPackagesFailure) Error() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	indent := ""
 
 	if len(e.failpkg) > 1 {
@@ -422,7 +423,7 @@ func (e *checkeeHasProblemPackagesFailure) Error() string {
 }
 
 func (e *checkeeHasProblemPackagesFailure) traceString() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 
 	fmt.Fprintf(&buf, "%s at %s has problem subpkg(s):\n", e.goal.id.ProjectRoot, e.goal.v)
 	for pkg, errdep := range e.failpkg {
@@ -493,7 +494,7 @@ func (e *depHasProblemPackagesFailure) Error() string {
 		)
 	}
 
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fmt.Fprintf(
 		&buf, "Could not introduce %s, as it requires problematic packages from %s (current version %s):",
 		a2vs(e.goal.depender),
@@ -516,7 +517,7 @@ func (e *depHasProblemPackagesFailure) Error() string {
 }
 
 func (e *depHasProblemPackagesFailure) traceString() string {
-	var buf bytes.Buffer
+	var buf compat.StrBuffer
 	fcause := func(pkg string) string {
 		if err := e.prob[pkg]; err != nil {
 			return fmt.Sprintf("has parsing err (%T).", err)
