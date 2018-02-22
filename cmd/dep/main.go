@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"github.com/golang/dep"
 	"github.com/golang/dep/internal/fs"
@@ -194,6 +195,16 @@ func (c *Config) Run() int {
 				}
 			}
 
+			var cacheAge time.Duration
+			if env := getEnv(c.Env, "DEPCACHEAGE"); env != "" {
+				var err error
+				cacheAge, err = time.ParseDuration(env)
+				if err != nil {
+					errLogger.Printf("dep: failed to parse $DEPCACHEAGE duration %q: %v\n", env, err)
+					return errorExitCode
+				}
+			}
+
 			// Set up dep context.
 			ctx := &dep.Ctx{
 				Out:            outLogger,
@@ -201,6 +212,7 @@ func (c *Config) Run() int {
 				Verbose:        *verbose,
 				DisableLocking: getEnv(c.Env, "DEPNOLOCK") != "",
 				Cachedir:       cachedir,
+				CacheAge:       cacheAge,
 			}
 
 			GOPATHS := filepath.SplitList(getEnv(c.Env, "GOPATH"))
